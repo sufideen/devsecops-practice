@@ -1,0 +1,42 @@
+{
+  "module1": [
+    {
+      "q": "Why apply Azure Policy before workload deployment?",
+      "choices": [
+        "To decorate resources",
+        "To enforce guardrails early",
+        "To save cost only",
+        "No reason"
+      ],
+      "answer": 1
+    },
+    {
+      "q": "Bicep advantage?",
+      "choices": [
+        "Worse readability",
+        "No tooling",
+        "Native Azure IaC",
+        "Only for AWS"
+      ],
+      "answer": 2
+    }
+  ],
+  "module2": [
+    {
+      "q": "SAST checks...",
+      "choices": [
+        "Running apps",
+        "Source code"
+      ],
+      "answer": 1
+    },
+    {
+      "q": "TruffleHog finds...",
+      "choices": [
+        "licenses",
+        "secrets"
+      ],
+      "answer": 1
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>DevSecOps Flashcards</title>
+<style>
+body{font-family:system-ui,Segoe UI,Arial;margin:2rem;background:#f7f7fb}
+#wrap{max-width:900px;margin:0 auto}
+select,button{padding:.6rem 1rem;margin:.25rem}
+.card{background:#fff;border:1px solid #ddd;border-radius:10px;padding:2rem;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.q{font-size:1.2rem}
+.a{margin-top:1rem;color:#044}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <h1>DevSecOps Flashcards</h1>
+  <p>Select a module and practice key concepts.</p>
+  <select id="module"></select>
+  <button id="prev">Prev</button>
+  <button id="flip">Flip</button>
+  <button id="next">Next</button>
+  <div class="card">
+    <div class="q" id="q"></div>
+    <div class="a" id="a" style="display:none"></div>
+  </div>
+</div>
+<script>
+let data={}, keys=[], k='module1', i=0, show=false;
+async function load(){
+  const r = await fetch('../data/cards.json');
+  data = await r.json();
+  keys = Object.keys(data);
+  const sel = document.getElementById('module');
+  sel.innerHTML = keys.map(x=>`<option value="${x}">${x}</option>`).join('');
+  sel.value = k; sel.onchange = ()=>{k=sel.value;i=0;render(true)};
+  render(true);
+}
+function render(reset){
+  const set = data[k]||[]; if (!set.length) return;
+  if (reset) { i=0; show=false; }
+  const c=set[i];
+  document.getElementById('q').textContent=c.q;
+  const a=document.getElementById('a'); a.textContent=c.a; a.style.display=show?'block':'none';
+}
+window.onload=()=>{
+  document.getElementById('flip').onclick=()=>{show=!show;render()};
+  document.getElementById('next').onclick=()=>{i=(i+1)%data[k].length;show=false;render()};
+  document.getElementById('prev').onclick=()=>{i=(i-1+data[k].length)%data[k].length;show=false;render()};
+  load();
+}
+</script>
+</body>
+</html>

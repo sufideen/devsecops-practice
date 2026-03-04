@@ -1,0 +1,11 @@
+
+# GitHub Pages (Jekyll) configuration
+# Docs will be published from /docs using the "Pages" workflow included in this repo
+# After pushing, enable Pages: Settings → Pages → Deploy from a branch (gh-pages) or GitHub Actions
+
+name: DevSecOps Practice Docs
+markdown: kramdown
+theme: minima
+logo: /assets/logo.png
+title: DevSecOps Practice (VAK)
+description: Visual · Auditory · Kinesthetic learning path for Azure → DevSecOps

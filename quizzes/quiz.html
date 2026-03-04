@@ -1,0 +1,57 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>DevSecOps Quizzes</title>
+<style>
+body{font-family:system-ui,Segoe UI,Arial;background:#f7f7fb;margin:2rem}
+#app{max-width:900px;margin:0 auto}
+.question{background:#fff;padding:1rem;margin:1rem 0;border-radius:8px;border:1px solid #ddd}
+button{padding:.6rem 1rem;margin:.25rem}
+.score{font-weight:bold}
+</style>
+</head>
+<body>
+<div id="app">
+  <h1>DevSecOps Quizzes</h1>
+  <label>Module: <select id="module"></select></label>
+  <div id="list"></div>
+  <button id="grade">Grade</button>
+  <p class="score" id="score"></p>
+</div>
+<script>
+let data={}, mod='module1';
+async function load(){
+  const r = await fetch('./data/questions.json');
+  data = await r.json();
+  const sel = document.getElementById('module');
+  const keys = Object.keys(data);
+  sel.innerHTML = keys.map(x=>`<option>${x}</option>`).join('');
+  sel.value = mod; sel.onchange=()=>{mod=sel.value;render()};
+  render();
+}
+function render(){
+  const list=document.getElementById('list');
+  list.innerHTML='';
+  (data[mod]||[]).forEach((q,idx)=>{
+    const div=document.createElement('div');div.className='question';
+    const opts = q.choices.map((c,i)=>`<label><input type=radio name="q${idx}" value="${i}"> ${c}</label>`).join('<br/>');
+    div.innerHTML = `<p><strong>${idx+1}.</strong> ${q.q}</p>${opts}`;
+    list.appendChild(div);
+  });
+  document.getElementById('score').textContent='';
+}
+function grade(){
+  const qs=data[mod]||[]; let correct=0;
+  qs.forEach((q,idx)=>{
+    const sel=document.querySelector(`input[name=q${idx}]:checked`);
+    if (sel && Number(sel.value)===q.answer) correct++;
+  });
+  document.getElementById('score').textContent=`Score: ${correct}/${qs.length}`;
+}
+window.onload=()=>{document.getElementById('grade').onclick=grade;load()}
+</script>
+</body>
+</html>

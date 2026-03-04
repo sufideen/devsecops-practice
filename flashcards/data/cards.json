@@ -1,0 +1,40 @@
+{
+  "module1": [
+    {
+      "q": "Purpose of Management Groups?",
+      "a": "Hierarchy for governance & policy across subscriptions."
+    },
+    {
+      "q": "Why Bicep?",
+      "a": "Readable IaC, modules, tooling, native to Azure."
+    }
+  ],
+  "module2": [
+    {
+      "q": "SAST vs DAST?",
+      "a": "SAST analyzes code; DAST tests running apps."
+    },
+    {
+      "q": "Why policy gates?",
+      "a": "Block insecure infra before deployment."
+    }
+  ],
+  "module3": [
+    {
+      "q": "Role of Sentinel?",
+      "a": "Correlates signals, raises incidents, enables SOAR."
+    }
+  ],
+  "module4": [
+    {
+      "q": "Blue/Green key idea?",
+      "a": "Two environments; switch traffic to minimize downtime."
+    }
+  ],
+  "module5": [
+    {
+      "q": "Canary rollout?",
+      "a": "Gradual % traffic shift to validate stability."
+    }
+  ]
+}
