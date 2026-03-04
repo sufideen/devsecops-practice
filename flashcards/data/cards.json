@@ -1,40 +1,212 @@
 {
   "module1": [
     {
-      "q": "Purpose of Management Groups?",
-      "a": "Hierarchy for governance & policy across subscriptions."
+      "q": "What is a Management Group?",
+      "a": "A container that holds multiple Azure subscriptions. Policies and RBAC applied at MG level cascade down to all subscriptions inside it."
     },
     {
-      "q": "Why Bicep?",
-      "a": "Readable IaC, modules, tooling, native to Azure."
+      "q": "What is an Azure Landing Zone?",
+      "a": "A pre-configured, secure Azure environment that workloads deploy into. Includes networking, identity, governance, logging, and security already set up by a platform team."
+    },
+    {
+      "q": "What is Azure Policy?",
+      "a": "An Azure service that enforces rules on resources automatically. Effects include: Deny (blocks creation), Audit (flags non-compliance), DeployIfNotExists (auto-deploys companion resources), Modify (auto-adds tags)."
+    },
+    {
+      "q": "What is the difference between Deny and Audit policy effects?",
+      "a": "Deny blocks resource creation if it violates the rule. Audit allows creation but marks the resource as non-compliant in the compliance dashboard."
+    },
+    {
+      "q": "What is Bicep?",
+      "a": "Microsoft's Infrastructure-as-Code language for Azure. More readable and concise than ARM JSON. Compiles to ARM templates. Supports modules and type safety."
+    },
+    {
+      "q": "What is the Bicep 'what-if' command?",
+      "a": "az deployment sub what-if — shows what changes would be made without actually deploying. Used in pipelines to preview IaC changes before approval."
+    },
+    {
+      "q": "What is Conftest?",
+      "a": "A tool that runs OPA (Open Policy Agent) policy rules against config files (JSON, YAML, Bicep output). Used as a pipeline gate to block non-compliant IaC before deployment."
+    },
+    {
+      "q": "What is Policy-as-Code?",
+      "a": "Writing security and compliance rules as code (e.g., Rego/OPA) that run automatically in pipelines. Catches violations before they reach Azure, not after."
+    },
+    {
+      "q": "What are the four subscriptions in a standard Azure Landing Zone?",
+      "a": "Management (Log Analytics, Sentinel), Connectivity (Hub VNet, Firewall, Gateway), Identity (AD DS, RBAC), and Landing Zone subscriptions (Corp/Online workloads)."
+    },
+    {
+      "q": "What is an Azure Policy Initiative?",
+      "a": "A group of related policy definitions bundled together. Assign one initiative to enforce many rules at once. Example: Azure Security Benchmark initiative contains 200+ policies."
     }
   ],
   "module2": [
     {
-      "q": "SAST vs DAST?",
-      "a": "SAST analyzes code; DAST tests running apps."
+      "q": "What is SAST?",
+      "a": "Static Application Security Testing. Analyses source code WITHOUT running it. Finds vulnerabilities like SQL injection, XSS, insecure APIs. Runs at build time. Tools: CodeQL, Semgrep."
     },
     {
-      "q": "Why policy gates?",
-      "a": "Block insecure infra before deployment."
+      "q": "What is DAST?",
+      "a": "Dynamic Application Security Testing. Attacks a RUNNING application with malicious requests. Finds vulnerabilities that only appear at runtime. Tools: OWASP ZAP. Run against a test environment."
+    },
+    {
+      "q": "What does TruffleHog do?",
+      "a": "Scans your entire git history for accidentally committed secrets (API keys, passwords, tokens, certificates). Catches secrets even if they were deleted in a later commit."
+    },
+    {
+      "q": "What is Checkov?",
+      "a": "An open-source IaC scanner that checks Bicep, Terraform, CloudFormation, and Kubernetes manifests for security misconfigurations. Maps findings to CIS benchmarks and Azure Security Benchmark."
+    },
+    {
+      "q": "What is a policy gate in a pipeline?",
+      "a": "A pipeline step that FAILS the build if a security check (SAST, IaC scan, etc.) finds violations above a threshold. Prevents insecure code or infrastructure from being deployed."
+    },
+    {
+      "q": "What is an SBOM?",
+      "a": "Software Bill of Materials. A machine-readable list of every package, library, and dependency your application uses. Required for supply chain security compliance."
+    },
+    {
+      "q": "What is SCA?",
+      "a": "Software Composition Analysis. Checks your SBOM against CVE (Common Vulnerabilities and Exposures) databases to find packages with known vulnerabilities. Tool: Grype, Dependabot."
+    },
+    {
+      "q": "What is 'shift-left security'?",
+      "a": "Moving security checks earlier in the development lifecycle (to the left of the pipeline). Finding a vulnerability in code is far cheaper to fix than finding it in production."
+    },
+    {
+      "q": "What is the difference between a ZAP baseline scan and a full scan?",
+      "a": "Baseline scan: passive only, safe for CI/CD, no active attacks. Full scan: sends actual attack payloads. Use baseline in pipelines; use full scan in dedicated test environments only."
+    },
+    {
+      "q": "Why use managed identities instead of service principal secrets?",
+      "a": "Managed identities are automatically managed by Azure AD — no credentials to store, rotate, or accidentally commit. Eliminates the risk of secrets leaking from pipelines or code."
     }
   ],
   "module3": [
     {
-      "q": "Role of Sentinel?",
-      "a": "Correlates signals, raises incidents, enables SOAR."
+      "q": "What is Application Insights?",
+      "a": "Azure's Application Performance Monitoring (APM) service. Tracks requests, exceptions, dependencies, custom events, and metrics. Provides distributed tracing across microservices."
+    },
+    {
+      "q": "What is a Log Analytics Workspace?",
+      "a": "A central data store in Azure for all logs. Resources send logs here via diagnostic settings. You query logs using KQL (Kusto Query Language)."
+    },
+    {
+      "q": "What is KQL?",
+      "a": "Kusto Query Language. The query language for Log Analytics, Application Insights, and Sentinel. Similar to SQL. Key operators: where, project, summarize, extend, join, order by."
+    },
+    {
+      "q": "What is Microsoft Sentinel?",
+      "a": "Azure's cloud-native SIEM (Security Information and Event Management) and SOAR (Security Orchestration, Automation and Response) platform. Collects logs, detects threats, automates responses."
+    },
+    {
+      "q": "What is the difference between a metric alert and a log alert?",
+      "a": "Metric alert: near real-time, based on Azure Monitor metrics (CPU, latency). Log alert: based on KQL query results, minimum 1-minute frequency. Metric is faster; log is more flexible."
+    },
+    {
+      "q": "What is a Logic App Playbook in Sentinel?",
+      "a": "A Logic App that automatically runs when Sentinel raises an incident. Can notify teams (Teams, email), create tickets (Jira, ServiceNow), isolate VMs, or revoke user sessions."
+    },
+    {
+      "q": "What is SOAR?",
+      "a": "Security Orchestration, Automation and Response. Automates repetitive security tasks: alert triage, incident notification, containment actions. Implemented via Logic Apps in Sentinel."
+    },
+    {
+      "q": "What are the three pillars of observability?",
+      "a": "Metrics (numerical measurements over time — CPU, latency, error rate), Logs (timestamped records of events), Traces (end-to-end request journeys across microservices)."
+    },
+    {
+      "q": "What is a diagnostic setting in Azure?",
+      "a": "Configuration that routes a resource's logs and metrics to a destination: Log Analytics workspace, Storage Account, or Event Hub. Must be enabled manually on each resource."
+    },
+    {
+      "q": "What is distributed tracing in Application Insights?",
+      "a": "Application Insights assigns a correlation ID (operation_Id) to each request. This ID is passed between microservices, allowing you to trace a single user request across multiple services."
     }
   ],
   "module4": [
     {
-      "q": "Blue/Green key idea?",
-      "a": "Two environments; switch traffic to minimize downtime."
+      "q": "What is a Blue/Green deployment?",
+      "a": "A strategy with two identical production environments (Blue = current, Green = new). You deploy to Green, test it, then switch all traffic from Blue to Green. Instant rollback by switching back."
+    },
+    {
+      "q": "How does traffic switching work in AKS Blue/Green?",
+      "a": "A Kubernetes Service uses a label selector (e.g., version: blue). Changing the selector to version: green instantly routes all new connections to Green pods. In-flight requests complete on Blue."
+    },
+    {
+      "q": "What is a Kubernetes label selector?",
+      "a": "A key-value pair that Kubernetes uses to match a Service to the correct pods. The Service routes traffic only to pods with matching labels. Changing the selector is how Blue/Green switching works."
+    },
+    {
+      "q": "What is a Kubernetes readiness probe?",
+      "a": "A health check that Kubernetes runs on a pod. The pod only receives traffic when the readiness probe passes. Prevents sending traffic to a pod that is starting up or temporarily unhealthy."
+    },
+    {
+      "q": "What is the difference between a readiness probe and a liveness probe?",
+      "a": "Readiness probe: controls whether a pod receives traffic (not ready = removed from Service). Liveness probe: controls whether a pod is restarted (not alive = killed and restarted by Kubernetes)."
+    },
+    {
+      "q": "What is Azure Container Registry (ACR)?",
+      "a": "Azure's private Docker image registry. Store and manage container images. AKS pulls images from ACR using managed identity — no credentials needed."
+    },
+    {
+      "q": "Why use immutable image tags instead of 'latest'?",
+      "a": "':latest' changes with every build — you can't tell which version is deployed. Immutable tags (v1.0, Build.BuildId) ensure you know exactly what is running and can reproduce any deployment."
+    },
+    {
+      "q": "What is Helm?",
+      "a": "A package manager for Kubernetes. Bundles Kubernetes manifests into a 'chart'. Supports templating (e.g., inject image tag at deploy time), versioning, and rollback with helm rollback."
+    },
+    {
+      "q": "What is the key command to switch traffic from Blue to Green?",
+      "a": "kubectl patch service <service-name> -p '{\"spec\":{\"selector\":{\"app\":\"my-app\",\"version\":\"green\"}}}'"
+    },
+    {
+      "q": "Why should you keep the Blue deployment running after switching to Green?",
+      "a": "To enable instant rollback. If Green has a critical bug, switch the Service selector back to Blue immediately. Delete Blue only after Green has been stable for 24-48 hours."
     }
   ],
   "module5": [
     {
-      "q": "Canary rollout?",
-      "a": "Gradual % traffic shift to validate stability."
+      "q": "What is a Canary deployment?",
+      "a": "A strategy that sends a small % of real user traffic to a new version. You monitor for errors, then gradually increase traffic (10% → 50% → 100%) or roll back to 0% if issues arise."
+    },
+    {
+      "q": "What is an Azure Container App revision?",
+      "a": "An immutable snapshot of a Container App at a specific version. When you update the app, ACA creates a new revision. You split traffic between revisions to implement canary deployments."
+    },
+    {
+      "q": "What is the difference between Canary and Blue/Green?",
+      "a": "Blue/Green: switch ALL traffic instantly (0% or 100%). Canary: gradually shift traffic (10% → 50% → 100%). Canary tests with real user traffic and is lower risk, but slower to fully release."
+    },
+    {
+      "q": "How do you set traffic splitting in Azure Container Apps?",
+      "a": "az containerapp ingress traffic set --name <app> --resource-group <rg> --revision-weight <rev1>=90 <rev2>=10"
+    },
+    {
+      "q": "What does 'multiple revision mode' mean in ACA?",
+      "a": "Allows more than one revision to be active at the same time and receive traffic. Required for canary deployments. Set with: az containerapp revision set-mode --mode multiple"
+    },
+    {
+      "q": "What is KEDA?",
+      "a": "Kubernetes Event-Driven Autoscaling. The autoscaling engine used by Azure Container Apps. Scales based on external events (queue length, HTTP requests, cron) rather than just CPU/memory."
+    },
+    {
+      "q": "What is Dapr?",
+      "a": "Distributed Application Runtime. A sidecar that provides microservice building blocks: service discovery, pub/sub messaging, state management, secrets. Natively supported in ACA."
+    },
+    {
+      "q": "What is the ACA ingress?",
+      "a": "ACA's built-in load balancer and TLS termination. No need to deploy an ingress controller yourself. Supports external (internet-facing) and internal (VNet only) ingress."
+    },
+    {
+      "q": "What is the difference between ACA and AKS?",
+      "a": "ACA: fully managed serverless containers, no Kubernetes expertise needed, built-in scaling/ingress/Dapr. AKS: full Kubernetes control, manage node pools yourself, more flexibility. ACA = simpler, AKS = more control."
+    },
+    {
+      "q": "Why deactivate old revisions in ACA?",
+      "a": "Inactive revisions still consume CPU and memory resources. Deactivate with: az containerapp revision deactivate --revision <name>. Only keep revisions you may need for rollback."
     }
   ]
 }

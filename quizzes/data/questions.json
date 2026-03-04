@@ -1,42 +1,452 @@
 {
   "module1": [
     {
-      "q": "Why apply Azure Policy before workload deployment?",
+      "q": "Why apply Azure Policy BEFORE workloads are deployed into a Landing Zone?",
       "choices": [
-        "To decorate resources",
-        "To enforce guardrails early",
-        "To save cost only",
-        "No reason"
+        "To reduce Azure costs for the platform team",
+        "To enforce guardrails automatically — workloads inherit compliance from day 1",
+        "To decorate resources with metadata",
+        "Policies only work on existing resources, not new ones"
       ],
-      "answer": 1
+      "answer": 1,
+      "explanation": "Azure Policy assigned at Management Group or Subscription level applies to ALL resources created in that scope. Workloads inherit compliance rules from day 1, preventing non-compliant resources from being created."
     },
     {
-      "q": "Bicep advantage?",
+      "q": "What is the main advantage of Bicep over ARM JSON templates?",
       "choices": [
-        "Worse readability",
-        "No tooling",
-        "Native Azure IaC",
-        "Only for AWS"
+        "Bicep is cross-cloud and works on AWS and GCP",
+        "Bicep templates deploy faster than ARM JSON",
+        "Bicep is more readable, supports modules, and has full Azure tooling integration",
+        "Bicep requires no compilation step"
       ],
-      "answer": 2
+      "answer": 2,
+      "explanation": "Bicep is more concise and readable than ARM JSON, supports reusable modules, has VS Code IntelliSense, and is native to Azure. It compiles transparently to ARM JSON at deploy time."
+    },
+    {
+      "q": "Which Azure Policy effect would you use to automatically add a missing tag to a resource?",
+      "choices": [
+        "Deny",
+        "Audit",
+        "Modify",
+        "AuditIfNotExists"
+      ],
+      "answer": 2,
+      "explanation": "The Modify effect automatically adds, removes, or updates tags (and some properties) on resources. Deny blocks creation; Audit flags non-compliance; AuditIfNotExists audits when a related resource is missing."
+    },
+    {
+      "q": "In the Azure Landing Zone hierarchy, which subscription holds the Hub VNet, Azure Firewall, and VPN Gateway?",
+      "choices": [
+        "Management subscription",
+        "Identity subscription",
+        "Connectivity subscription",
+        "Landing Zone subscription"
+      ],
+      "answer": 2,
+      "explanation": "The Connectivity subscription in the Platform Management Group holds shared networking infrastructure: Hub VNet, Azure Firewall, VPN/ExpressRoute Gateway, and Azure DNS private zones."
+    },
+    {
+      "q": "What command shows what Bicep would change WITHOUT actually deploying?",
+      "choices": [
+        "az deployment sub validate",
+        "az deployment sub what-if",
+        "az bicep build --dry-run",
+        "az deployment sub preview"
+      ],
+      "answer": 1,
+      "explanation": "'az deployment sub what-if' shows a preview of resource changes (create, modify, delete) without applying them. Useful in CI/CD pipelines for review/approval gates before deployment."
+    },
+    {
+      "q": "What does Conftest do in a DevSecOps pipeline?",
+      "choices": [
+        "It runs unit tests against application code",
+        "It scans Docker images for vulnerabilities",
+        "It validates config files against OPA policy rules, failing the pipeline if rules are violated",
+        "It generates compliance reports for auditors"
+      ],
+      "answer": 2,
+      "explanation": "Conftest evaluates configuration files (JSON, YAML, Bicep ARM output) against OPA (Open Policy Agent) Rego rules. If a policy violation is found, the pipeline fails — blocking non-compliant IaC."
+    },
+    {
+      "q": "What is the difference between a Policy Definition and a Policy Initiative?",
+      "choices": [
+        "There is no difference — they are the same thing",
+        "A Policy Definition is a single rule; a Policy Initiative bundles multiple definitions together",
+        "Initiatives apply to subscriptions; definitions apply to resource groups only",
+        "Definitions enforce rules; initiatives only audit"
+      ],
+      "answer": 1,
+      "explanation": "A Policy Definition is a single policy rule. A Policy Initiative (also called a policy set) bundles multiple definitions together, so you can assign many policies with a single initiative assignment."
+    },
+    {
+      "q": "A new resource group is created without the required 'environment' tag. The Azure Policy effect is set to 'Audit'. What happens?",
+      "choices": [
+        "The resource group creation is blocked",
+        "The resource group is created and marked as non-compliant in the policy dashboard",
+        "The tag is automatically added to the resource group",
+        "The policy effect has no impact until it is changed to Deny"
+      ],
+      "answer": 1,
+      "explanation": "Audit allows the resource to be created but marks it as non-compliant in the Azure Policy compliance dashboard. It does NOT block creation. To block, use Deny. To auto-fix, use Modify."
     }
   ],
   "module2": [
     {
-      "q": "SAST checks...",
+      "q": "SAST (Static Application Security Testing) analyses...",
       "choices": [
-        "Running apps",
-        "Source code"
+        "A running application by sending it attack traffic",
+        "Source code without executing it, looking for vulnerability patterns",
+        "Container images for known CVEs",
+        "Network traffic between microservices"
       ],
-      "answer": 1
+      "answer": 1,
+      "explanation": "SAST reads source code statically without running it. It finds patterns that indicate vulnerabilities (SQL injection, XSS, insecure crypto). Tools: CodeQL, Semgrep. Runs at build time."
     },
     {
-      "q": "TruffleHog finds...",
+      "q": "TruffleHog is configured to scan the full git history (fetchDepth: 0). Why is this important?",
       "choices": [
-        "licenses",
-        "secrets"
+        "Secrets can only be found in the most recent commit",
+        "Scanning full history is faster than scanning only HEAD",
+        "A developer may have committed a secret weeks ago and 'deleted' it — the secret still exists in git history",
+        "TruffleHog requires full history to compile its regex patterns"
       ],
-      "answer": 1
+      "answer": 2,
+      "explanation": "Git retains ALL history, including deleted content. A secret committed 3 months ago and later deleted still exists in the repo's history and can be extracted. TruffleHog must scan full history to catch it."
+    },
+    {
+      "q": "You run Checkov on a Bicep file and get: 'CKV_AZURE_110: Ensure that Azure key vault enables soft delete'. What does this mean?",
+      "choices": [
+        "The Key Vault has a vulnerability that allows remote code execution",
+        "The Key Vault is configured without soft delete, meaning secrets could be permanently lost if accidentally deleted",
+        "The Key Vault is not connected to Azure AD",
+        "The Key Vault does not have a private endpoint"
+      ],
+      "answer": 1,
+      "explanation": "CKV_AZURE_110 checks that Key Vault has soft delete enabled. Without it, if a secret is accidentally deleted, it is gone permanently. Soft delete retains deleted items for a configurable period (default 90 days)."
+    },
+    {
+      "q": "At which pipeline stage should OWASP ZAP run?",
+      "choices": [
+        "Before the application is built (pre-build)",
+        "During the source code analysis stage (alongside CodeQL)",
+        "After deploying to a test environment — DAST needs a running application to attack",
+        "As a pre-commit hook on the developer's machine"
+      ],
+      "answer": 2,
+      "explanation": "DAST tools like OWASP ZAP need a RUNNING application to test. They send actual HTTP requests. Deploy to a dedicated test environment first, then run ZAP. Never run a full ZAP scan against production."
+    },
+    {
+      "q": "What is the purpose of a Manual Approval Gate in an Azure DevOps release pipeline?",
+      "choices": [
+        "To delay deployments by a fixed number of hours",
+        "To require a named approver to review and approve before the pipeline continues to the next stage",
+        "To automatically run integration tests before deploying",
+        "To enforce a maximum deployment frequency (e.g., once per day)"
+      ],
+      "answer": 1,
+      "explanation": "Manual approval gates pause the pipeline and require a designated person to approve before continuing. Used before deploying to production — a human reviews SAST/DAST results and approves."
+    },
+    {
+      "q": "Why should secrets be stored in Azure Key Vault instead of Azure DevOps pipeline variables?",
+      "choices": [
+        "Key Vault secrets are faster to retrieve at pipeline run time",
+        "Pipeline variables are not encrypted at rest",
+        "Key Vault provides auditable access logs, RBAC, rotation, and secrets are never visible in plain text",
+        "Azure DevOps does not support secret variables"
+      ],
+      "answer": 2,
+      "explanation": "Azure Key Vault provides: audit logs of every access, RBAC for who can read secrets, automatic rotation, and soft delete. Managed identity eliminates credential management entirely."
+    },
+    {
+      "q": "A developer commits an AWS access key to a feature branch by mistake. They delete it in the next commit and open a PR. What should happen?",
+      "choices": [
+        "The secret is gone because the file was deleted — no action needed",
+        "TruffleHog on the PR pipeline catches the secret in the git history and fails the pipeline",
+        "The PR reviewer should check for secrets manually before approving",
+        "The CI pipeline ignores deleted files"
+      ],
+      "answer": 1,
+      "explanation": "Deleting a file in git does NOT remove it from git history. The commit that added the secret still exists. TruffleHog scans full history and will flag it. The secret must be revoked/rotated regardless."
+    },
+    {
+      "q": "Which security check should run FIRST in a DevSecOps pipeline?",
+      "choices": [
+        "DAST (OWASP ZAP) — test the app as early as possible",
+        "IaC scan (Checkov) — infrastructure must be secure before code matters",
+        "SAST (CodeQL/Semgrep) — find code vulnerabilities at build time before deployment",
+        "Secrets scan (TruffleHog) and SAST run together before build artifacts are produced"
+      ],
+      "answer": 3,
+      "explanation": "Secrets scanning and SAST run on source code at the earliest stage — before the app is built or deployed. IaC scan runs next (before infrastructure deploys). DAST runs last — it needs a running app."
+    }
+  ],
+  "module3": [
+    {
+      "q": "What is the difference between Azure Monitor and Microsoft Sentinel?",
+      "choices": [
+        "They are the same service with different names",
+        "Azure Monitor handles infrastructure/app performance monitoring and alerting; Sentinel is a SIEM for security threat detection and response",
+        "Azure Monitor is for VMs only; Sentinel is for web apps",
+        "Sentinel requires a separate Log Analytics workspace from Azure Monitor"
+      ],
+      "answer": 1,
+      "explanation": "Azure Monitor handles metrics, performance alerts, and diagnostics for infrastructure/apps. Microsoft Sentinel is a SIEM/SOAR that ingests security logs, detects threats using analytics rules, and automates responses."
+    },
+    {
+      "q": "Which KQL query finds all failed HTTP requests in the last hour?",
+      "choices": [
+        "requests | where failed == true | where time > 1h",
+        "requests | where timestamp > ago(1h) | where success == false",
+        "SELECT * FROM requests WHERE status = 'failed' AND time > NOW() - 1h",
+        "AppRequests | filter timestamp > ago(1h) | filter ResultCode >= 400"
+      ],
+      "answer": 1,
+      "explanation": "KQL syntax: table name first, then pipe (|) to filter operations. 'ago(1h)' means 1 hour ago. 'success == false' filters for failed requests. Option A uses wrong syntax; C is SQL; D uses wrong operators."
+    },
+    {
+      "q": "What does a Log Analytics Workspace data retention setting control?",
+      "choices": [
+        "How long it takes for logs to appear after being sent",
+        "The maximum size of a single log entry",
+        "How many days logs are retained before being deleted (default 30 days, max 730 days)",
+        "How frequently Log Analytics polls connected resources for logs"
+      ],
+      "answer": 2,
+      "explanation": "Data retention controls how long logs are kept. Default is 30 days (free tier) or 31-730 days (paid). Security compliance often requires 90 days minimum. Longer retention increases cost."
+    },
+    {
+      "q": "An alert fires in Azure Monitor. No one is notified. What is most likely missing?",
+      "choices": [
+        "The alert rule has no condition defined",
+        "The alert is set to Sev 4 (verbose) instead of Sev 0 (critical)",
+        "The alert rule has no Action Group attached",
+        "The Log Analytics workspace has no diagnostic settings"
+      ],
+      "answer": 2,
+      "explanation": "Alert rules fire silently without an Action Group. An Action Group defines WHO gets notified (email, SMS, webhook, Teams) and HOW. Always attach an Action Group to every alert rule."
+    },
+    {
+      "q": "What is distributed tracing in Application Insights?",
+      "choices": [
+        "Tracing the geographic distribution of users across Azure regions",
+        "Correlating a single user request across multiple microservices using a shared operation_Id",
+        "Monitoring network packet routes between Azure services",
+        "Tracking the deployment history of an application"
+      ],
+      "answer": 1,
+      "explanation": "Distributed tracing assigns a correlation ID (operation_Id) to each incoming request. This ID is propagated between services, allowing you to see the full end-to-end journey of a single request across all microservices."
+    },
+    {
+      "q": "What is SOAR?",
+      "choices": [
+        "Security Operations and Audit Reporting",
+        "Security Orchestration, Automation and Response — automating incident handling actions",
+        "A Microsoft tool for scanning cloud configurations",
+        "The process of manually triaging security alerts"
+      ],
+      "answer": 1,
+      "explanation": "SOAR (Security Orchestration, Automation and Response) automates repetitive security tasks. In Azure Sentinel, SOAR is implemented via Logic App playbooks that auto-notify, isolate resources, or create tickets on incidents."
+    },
+    {
+      "q": "You want to alert when the number of exceptions in your app exceeds 20 in a 5-minute window. What type of alert should you create?",
+      "choices": [
+        "Metric alert on the 'exceptions/count' metric",
+        "Log alert using a KQL query against Application Insights",
+        "Activity Log alert",
+        "Service Health alert"
+      ],
+      "answer": 1,
+      "explanation": "A Log alert with a KQL query (e.g., 'exceptions | where timestamp > ago(5m) | summarize count()') gives you the flexibility to count specific exception types over a time window. Metric alerts work for basic metrics; log alerts are more flexible."
+    },
+    {
+      "q": "What is the purpose of Sentinel Analytics Rules?",
+      "choices": [
+        "To generate compliance reports for Azure resources",
+        "To automatically optimise Log Analytics queries for performance",
+        "To detect suspicious patterns in collected logs and raise security incidents",
+        "To configure data retention policies on the Log Analytics workspace"
+      ],
+      "answer": 2,
+      "explanation": "Sentinel Analytics Rules run scheduled KQL queries against your log data. When a rule's condition is met (e.g., impossible travel, brute force login), Sentinel raises an incident for investigation."
+    }
+  ],
+  "module4": [
+    {
+      "q": "What is the key difference between Blue/Green deployment and a Rolling deployment?",
+      "choices": [
+        "Blue/Green uses containers; Rolling uses VMs",
+        "Blue/Green switches all traffic at once between two full environments; Rolling gradually replaces pods one at a time in the same deployment",
+        "Rolling is faster than Blue/Green",
+        "Blue/Green requires Helm; Rolling does not"
+      ],
+      "answer": 1,
+      "explanation": "Blue/Green: two full environments, all traffic switches instantly. Rolling: gradually replaces pods — some run v1, some v2 simultaneously during the rollout. Rolling has no instant rollback; Blue/Green does."
+    },
+    {
+      "q": "In AKS Blue/Green, you have switched traffic to Green. Green now has a critical bug. What is the fastest rollback?",
+      "choices": [
+        "Delete the Green deployment and wait for Kubernetes to reschedule pods",
+        "Run 'kubectl rollout undo deployment/my-app-green' to revert the image",
+        "Patch the Service selector back to 'version: blue' — traffic instantly returns to Blue",
+        "Redeploy the Blue image to the Green deployment"
+      ],
+      "answer": 2,
+      "explanation": "Patching the Service selector is instant — Kubernetes updates iptables rules within seconds. kubectl patch service my-app-svc -p '{\"spec\":{\"selector\":{\"app\":\"my-app\",\"version\":\"blue\"}}}'"
+    },
+    {
+      "q": "What is a Kubernetes readiness probe?",
+      "choices": [
+        "A check that restarts a pod if it becomes unresponsive",
+        "A check that prevents traffic from being sent to a pod that is not ready to serve requests",
+        "A health check that scales the deployment up when pods are overloaded",
+        "A security check that validates container image signatures"
+      ],
+      "answer": 1,
+      "explanation": "Readiness probes determine if a pod is ready to receive traffic. Until the readiness probe passes, the pod is removed from the Service's endpoint list. This ensures traffic only goes to healthy, ready pods."
+    },
+    {
+      "q": "You deploy a Green image with a new configuration. The pods start but the app fails its health check. What happens?",
+      "choices": [
+        "Kubernetes automatically switches traffic to Green anyway",
+        "The Green deployment fails to roll out — pods never become Ready and never receive traffic",
+        "Kubernetes deletes the Blue deployment to free resources",
+        "The pipeline fails and Green is rolled back automatically"
+      ],
+      "answer": 1,
+      "explanation": "If readiness probes fail, Green pods never enter the Ready state. The Kubernetes Service never adds them to its endpoint list. Traffic stays on Blue. kubectl rollout status will show 'waiting for rollout to finish'."
+    },
+    {
+      "q": "Why should you use immutable image tags like 'v2.0' or a build ID instead of ':latest'?",
+      "choices": [
+        "':latest' is deprecated and no longer supported in Kubernetes",
+        "Immutable tags allow you to know exactly which version is deployed, reproduce deployments, and roll back to a specific known-good version",
+        "':latest' causes image pull failures in AKS",
+        "ACR does not support the ':latest' tag"
+      ],
+      "answer": 1,
+      "explanation": "':latest' is overwritten on every build — you cannot tell which code is actually running, you cannot reproduce a past deployment, and rollback may deploy different code than intended. Always use immutable, versioned tags."
+    },
+    {
+      "q": "How does AKS authenticate to Azure Container Registry (ACR) without storing credentials?",
+      "choices": [
+        "AKS uses a shared username/password stored in a Kubernetes Secret",
+        "AKS uses a managed identity with AcrPull role on the ACR",
+        "AKS connects to ACR via service principal credentials stored in Key Vault",
+        "ACR generates a time-limited token that AKS refreshes hourly"
+      ],
+      "answer": 1,
+      "explanation": "When you create an AKS cluster with --attach-acr, Azure configures the cluster's managed identity with the AcrPull role on that registry. No credentials are needed — Azure AD handles authentication automatically."
+    },
+    {
+      "q": "What does 'kubectl rollout status deployment/my-app-green' tell you?",
+      "choices": [
+        "The current CPU and memory usage of the Green deployment",
+        "Whether the Green deployment has successfully rolled out — all pods are running and passing readiness probes",
+        "The traffic percentage currently routed to Green",
+        "The Docker image tag being used by Green pods"
+      ],
+      "answer": 1,
+      "explanation": "'kubectl rollout status' waits until a deployment has fully rolled out (all pods running and ready) or reports an error. Essential smoke check BEFORE switching Service traffic from Blue to Green."
+    },
+    {
+      "q": "What is Helm in the context of AKS deployments?",
+      "choices": [
+        "Helm is a monitoring tool for Kubernetes clusters",
+        "Helm is a package manager for Kubernetes that bundles manifests into versioned, templated charts",
+        "Helm is an Azure-specific ingress controller",
+        "Helm replaces kubectl for all Kubernetes operations"
+      ],
+      "answer": 1,
+      "explanation": "Helm is a Kubernetes package manager. It bundles related manifests (Deployment, Service, ConfigMap) into a 'chart'. Supports templating (inject image tag, environment values), versioning, and rollback with 'helm rollback'."
+    }
+  ],
+  "module5": [
+    {
+      "q": "What is the key advantage of Canary over Blue/Green deployment?",
+      "choices": [
+        "Canary is faster to deploy than Blue/Green",
+        "Canary tests the new version with real production traffic at low risk, before fully committing",
+        "Canary uses less infrastructure than Blue/Green",
+        "Canary eliminates the need for a test environment"
+      ],
+      "answer": 1,
+      "explanation": "Canary sends real user traffic (e.g., 10%) to the new version. You observe real-world behaviour (error rates, latency) before promoting to 100%. Blue/Green uses only smoke tests before switching."
+    },
+    {
+      "q": "What is an Azure Container App revision?",
+      "choices": [
+        "A backup of the container app configuration",
+        "An immutable snapshot of the app at a specific version — traffic is split between active revisions",
+        "A scheduled maintenance window for the container app",
+        "A branch in the ACA Git integration"
+      ],
+      "answer": 1,
+      "explanation": "A revision is an immutable version snapshot of your ACA. Each deployment creates a new revision. In multiple-revision mode, you split traffic between revisions (e.g., 90% v1, 10% v2) for canary deployments."
+    },
+    {
+      "q": "You deploy a new revision to ACA and want to send 10% of traffic to it. Which command does this?",
+      "choices": [
+        "az containerapp update --traffic-weight new-revision=10",
+        "az containerapp ingress traffic set --revision-weight old-rev=90 new-rev=10",
+        "kubectl patch service my-app --patch '{traffic: 10%}'",
+        "az containerapp scale --revision new-rev --percentage 10"
+      ],
+      "answer": 1,
+      "explanation": "az containerapp ingress traffic set --name <app> --resource-group <rg> --revision-weight <old>=90 <new>=10. This sets traffic weights for active revisions. Weights must sum to 100."
+    },
+    {
+      "q": "Before you can run multiple revisions simultaneously in ACA, what must you configure?",
+      "choices": [
+        "Enable horizontal pod autoscaling",
+        "Attach an Azure Container Registry to the environment",
+        "Set revision mode to 'multiple': az containerapp revision set-mode --mode multiple",
+        "Create a separate ACA environment for each revision"
+      ],
+      "answer": 2,
+      "explanation": "By default, ACA uses 'single' revision mode — only one revision is active at a time. You must switch to 'multiple' revision mode to run two revisions simultaneously and split traffic between them."
+    },
+    {
+      "q": "What is KEDA?",
+      "choices": [
+        "A Kubernetes security scanning tool built into ACA",
+        "Kubernetes Event-Driven Autoscaling — scales ACA based on event sources like queue length or HTTP concurrency",
+        "A managed Kubernetes service in Azure (similar to AKS)",
+        "A monitoring agent deployed as a sidecar in each ACA replica"
+      ],
+      "answer": 1,
+      "explanation": "KEDA (Kubernetes Event-Driven Autoscaling) is the autoscaling engine built into Azure Container Apps. It scales based on event triggers: HTTP concurrency, Azure Service Bus queue length, Storage Queue depth, and more."
+    },
+    {
+      "q": "Your canary revision (10% traffic) shows a 5x increase in error rate compared to the stable revision. What should you do?",
+      "choices": [
+        "Wait 30 minutes — the error rate will stabilise as the new version warms up",
+        "Promote to 50% to gather more data before deciding",
+        "Immediately set canary revision to 0% traffic and investigate the errors",
+        "Delete the canary revision to free resources"
+      ],
+      "answer": 2,
+      "explanation": "A significant error rate increase is a rollback signal. Set canary to 0% immediately: az containerapp ingress traffic set --revision-weight old=100 new=0. Investigate the errors before attempting another canary."
+    },
+    {
+      "q": "What is Dapr in the context of Azure Container Apps?",
+      "choices": [
+        "A container security scanning tool integrated with ACA",
+        "The name of the ACA autoscaling policy engine",
+        "A sidecar runtime that provides microservice building blocks: pub/sub, service invocation, state, secrets",
+        "An Azure monitoring agent automatically injected into ACA containers"
+      ],
+      "answer": 2,
+      "explanation": "Dapr (Distributed Application Runtime) is an optional sidecar in ACA that provides: service-to-service invocation, pub/sub messaging, state management, and secret access — without requiring libraries in your application code."
+    },
+    {
+      "q": "What happens to old ACA revisions that are set to 0% traffic?",
+      "choices": [
+        "They are automatically deleted by ACA after 24 hours",
+        "They remain active and still consume CPU and memory resources unless you explicitly deactivate them",
+        "They are automatically deactivated when their traffic weight reaches 0%",
+        "They are kept as snapshots but consume no resources"
+      ],
+      "answer": 1,
+      "explanation": "Revisions at 0% traffic are still active and consume resources unless you explicitly deactivate them with: az containerapp revision deactivate --revision <name>. Always deactivate old revisions after a successful canary promotion."
     }
   ]
 }

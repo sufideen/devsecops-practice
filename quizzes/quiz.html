@@ -1,57 +1,407 @@
-
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>DevSecOps Quizzes</title>
+<title>DevSecOps Quiz – AZ-400 Practice</title>
 <style>
-body{font-family:system-ui,Segoe UI,Arial;background:#f7f7fb;margin:2rem}
-#app{max-width:900px;margin:0 auto}
-.question{background:#fff;padding:1rem;margin:1rem 0;border-radius:8px;border:1px solid #ddd}
-button{padding:.6rem 1rem;margin:.25rem}
-.score{font-weight:bold}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: system-ui, 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    min-height: 100vh;
+    padding: 1.5rem;
+    color: #f1f5f9;
+  }
+
+  #app { max-width: 820px; margin: 0 auto; }
+
+  header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #60a5fa;
+  }
+
+  header p { color: #94a3b8; margin-top: 0.4rem; font-size: 0.95rem; }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    background: rgba(255,255,255,0.05);
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .controls label { font-size: 0.85rem; color: #94a3b8; }
+
+  select {
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    background: #1e293b;
+    color: #f1f5f9;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+
+  .btn-row { display: flex; gap: 0.75rem; margin-top: 1.5rem; flex-wrap: wrap; }
+
+  button {
+    padding: 0.6rem 1.4rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.15s ease;
+  }
+
+  .btn-grade { background: #3b82f6; color: #fff; }
+  .btn-grade:hover { background: #2563eb; }
+
+  .btn-reset { background: rgba(255,255,255,0.08); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.12); }
+  .btn-reset:hover { background: rgba(255,255,255,0.14); }
+
+  .score-box {
+    background: #0f172a;
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin-top: 1.5rem;
+    border: 1px solid #334155;
+    display: none;
+  }
+
+  .score-box.visible { display: block; }
+
+  .score-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #60a5fa;
+  }
+
+  .score-label { color: #94a3b8; font-size: 0.9rem; margin-top: 0.25rem; }
+
+  .score-bar {
+    background: rgba(255,255,255,0.07);
+    border-radius: 99px;
+    height: 8px;
+    margin-top: 0.75rem;
+    overflow: hidden;
+  }
+
+  .score-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.6s ease;
+  }
+
+  .score-fill.great  { background: linear-gradient(90deg, #22c55e, #4ade80); }
+  .score-fill.ok     { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+  .score-fill.low    { background: linear-gradient(90deg, #ef4444, #f87171); }
+
+  /* Question cards */
+  .question {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+    transition: border-color 0.2s;
+  }
+
+  .question.correct  { border-color: #22c55e; background: rgba(34,197,94,0.07); }
+  .question.wrong    { border-color: #ef4444; background: rgba(239,68,68,0.07); }
+  .question.unanswered { border-color: #f59e0b; background: rgba(245,158,11,0.07); }
+
+  .question-number {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #60a5fa;
+    margin-bottom: 0.6rem;
+  }
+
+  .question-text {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #f1f5f9;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+
+  .choices label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    border: 1px solid transparent;
+    margin-bottom: 0.4rem;
+    transition: all 0.12s;
+    line-height: 1.45;
+  }
+
+  .choices label:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
+
+  .choices input[type=radio] { margin-top: 2px; flex-shrink: 0; accent-color: #3b82f6; }
+
+  /* After grading */
+  .choices label.correct-answer {
+    background: rgba(34,197,94,0.15);
+    border-color: #22c55e;
+    color: #bbf7d0;
+  }
+
+  .choices label.wrong-answer {
+    background: rgba(239,68,68,0.1);
+    border-color: #ef4444;
+    color: #fca5a5;
+    text-decoration: line-through;
+    opacity: 0.7;
+  }
+
+  .result-icon {
+    font-weight: 700;
+    margin-left: 0.5rem;
+  }
+
+  .explanation {
+    margin-top: 0.85rem;
+    padding: 0.75rem 1rem;
+    background: rgba(14,165,233,0.1);
+    border-left: 3px solid #0ea5e9;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.85rem;
+    color: #7dd3fc;
+    line-height: 1.55;
+    display: none;
+  }
+
+  .explanation.visible { display: block; }
+
+  /* Module badges */
+  .module-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .badge {
+    padding: 0.3rem 0.75rem;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.15s;
+  }
+
+  .badge.active   { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+  .badge.inactive { background: rgba(255,255,255,0.06); color: #94a3b8; border-color: rgba(255,255,255,0.1); }
+  .badge.inactive:hover { background: rgba(255,255,255,0.1); color: #cbd5e1; }
 </style>
 </head>
 <body>
 <div id="app">
-  <h1>DevSecOps Quizzes</h1>
-  <label>Module: <select id="module"></select></label>
+
+  <header>
+    <h1>DevSecOps Quiz</h1>
+    <p>AZ-400-style multiple choice questions. Select answers, then click Grade to see results and explanations.</p>
+  </header>
+
+  <div class="module-badges" id="badges"></div>
+
+  <div class="controls">
+    <label for="module">Module:</label>
+    <select id="module"></select>
+  </div>
+
   <div id="list"></div>
-  <button id="grade">Grade</button>
-  <p class="score" id="score"></p>
+
+  <div class="btn-row">
+    <button class="btn-grade" id="grade">Grade Quiz</button>
+    <button class="btn-reset" id="reset">Reset</button>
+  </div>
+
+  <div class="score-box" id="score-box">
+    <div class="score-number" id="score-number">0/0</div>
+    <div class="score-label" id="score-label">Complete the quiz above, then click Grade.</div>
+    <div class="score-bar"><div class="score-fill" id="score-fill" style="width:0%"></div></div>
+  </div>
+
 </div>
+
 <script>
-let data={}, mod='module1';
-async function load(){
-  const r = await fetch('./data/questions.json');
-  data = await r.json();
-  const sel = document.getElementById('module');
-  const keys = Object.keys(data);
-  sel.innerHTML = keys.map(x=>`<option>${x}</option>`).join('');
-  sel.value = mod; sel.onchange=()=>{mod=sel.value;render()};
-  render();
-}
-function render(){
-  const list=document.getElementById('list');
-  list.innerHTML='';
-  (data[mod]||[]).forEach((q,idx)=>{
-    const div=document.createElement('div');div.className='question';
-    const opts = q.choices.map((c,i)=>`<label><input type=radio name="q${idx}" value="${i}"> ${c}</label>`).join('<br/>');
-    div.innerHTML = `<p><strong>${idx+1}.</strong> ${q.q}</p>${opts}`;
-    list.appendChild(div);
-  });
-  document.getElementById('score').textContent='';
-}
-function grade(){
-  const qs=data[mod]||[]; let correct=0;
-  qs.forEach((q,idx)=>{
-    const sel=document.querySelector(`input[name=q${idx}]:checked`);
-    if (sel && Number(sel.value)===q.answer) correct++;
-  });
-  document.getElementById('score').textContent=`Score: ${correct}/${qs.length}`;
-}
-window.onload=()=>{document.getElementById('grade').onclick=grade;load()}
+  const MODULE_LABELS = {
+    module1: 'M1: Landing Zone',
+    module2: 'M2: Pipeline',
+    module3: 'M3: Observability',
+    module4: 'M4: AKS Blue/Green',
+    module5: 'M5: ACA Canary'
+  };
+
+  let data = {}, currentModule = 'module1', graded = false;
+
+  async function load() {
+    const res = await fetch('./data/questions.json');
+    data = await res.json();
+
+    const keys = Object.keys(data);
+    const sel = document.getElementById('module');
+    sel.innerHTML = keys.map(k => `<option value="${k}">${MODULE_LABELS[k] || k}</option>`).join('');
+    sel.value = currentModule;
+    sel.onchange = () => { currentModule = sel.value; graded = false; syncBadges(); render(); };
+
+    buildBadges(keys);
+    render();
+  }
+
+  function buildBadges(keys) {
+    const container = document.getElementById('badges');
+    container.innerHTML = keys.map(k =>
+      `<span class="badge ${k === currentModule ? 'active' : 'inactive'}" data-mod="${k}">${MODULE_LABELS[k] || k}</span>`
+    ).join('');
+    container.querySelectorAll('.badge').forEach(b => {
+      b.onclick = () => {
+        currentModule = b.dataset.mod;
+        graded = false;
+        document.getElementById('module').value = currentModule;
+        syncBadges();
+        render();
+      };
+    });
+  }
+
+  function syncBadges() {
+    document.querySelectorAll('.badge').forEach(b => {
+      b.className = 'badge ' + (b.dataset.mod === currentModule ? 'active' : 'inactive');
+    });
+  }
+
+  function render() {
+    const list = document.getElementById('list');
+    list.innerHTML = '';
+    document.getElementById('score-box').classList.remove('visible');
+
+    const questions = data[currentModule] || [];
+    questions.forEach((q, idx) => {
+      const div = document.createElement('div');
+      div.className = 'question';
+      div.dataset.idx = idx;
+
+      const opts = q.choices.map((c, i) =>
+        `<label>
+          <input type="radio" name="q${idx}" value="${i}">
+          ${c}
+        </label>`
+      ).join('');
+
+      div.innerHTML = `
+        <div class="question-number">Question ${idx + 1} of ${questions.length}</div>
+        <div class="question-text">${q.q}</div>
+        <div class="choices" id="choices-${idx}">${opts}</div>
+        <div class="explanation" id="exp-${idx}">${q.explanation || ''}</div>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  function grade() {
+    const questions = data[currentModule] || [];
+    let correct = 0;
+    let unanswered = 0;
+
+    questions.forEach((q, idx) => {
+      const selected = document.querySelector(`input[name="q${idx}"]:checked`);
+      const qDiv = document.querySelector(`.question[data-idx="${idx}"]`);
+      const choicesDiv = document.getElementById(`choices-${idx}`);
+      const expDiv = document.getElementById(`exp-${idx}`);
+      const labels = choicesDiv.querySelectorAll('label');
+
+      // Disable all inputs
+      choicesDiv.querySelectorAll('input').forEach(inp => inp.disabled = true);
+
+      if (!selected) {
+        unanswered++;
+        qDiv.classList.add('unanswered');
+      } else {
+        const userAnswer = Number(selected.value);
+        const isCorrect = userAnswer === q.answer;
+
+        if (isCorrect) {
+          correct++;
+          qDiv.classList.add('correct');
+          labels[userAnswer].classList.add('correct-answer');
+          labels[userAnswer].innerHTML += '<span class="result-icon" style="color:#22c55e">✓</span>';
+        } else {
+          qDiv.classList.add('wrong');
+          labels[userAnswer].classList.add('wrong-answer');
+          labels[userAnswer].innerHTML += '<span class="result-icon" style="color:#ef4444">✗</span>';
+          labels[q.answer].classList.add('correct-answer');
+          labels[q.answer].innerHTML += '<span class="result-icon" style="color:#22c55e">✓ Correct answer</span>';
+        }
+      }
+
+      if (q.explanation) expDiv.classList.add('visible');
+    });
+
+    // Show score
+    const total = questions.length;
+    const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
+    const scoreBox = document.getElementById('score-box');
+    document.getElementById('score-number').textContent = `${correct} / ${total} (${pct}%)`;
+
+    let label = '';
+    let fillClass = '';
+    if (pct >= 80) {
+      label = 'Excellent! You are ready for this topic. Review any wrong answers below.';
+      fillClass = 'great';
+    } else if (pct >= 60) {
+      label = 'Good progress. Review the explanations below and revisit the module doc.';
+      fillClass = 'ok';
+    } else {
+      label = 'Keep studying! Re-read the module, use the flashcards, then try again.';
+      fillClass = 'low';
+    }
+
+    if (unanswered > 0) label += ` (${unanswered} question${unanswered > 1 ? 's' : ''} unanswered)`;
+
+    document.getElementById('score-label').textContent = label;
+    const fill = document.getElementById('score-fill');
+    fill.className = 'score-fill ' + fillClass;
+    fill.style.width = pct + '%';
+
+    scoreBox.classList.add('visible');
+    scoreBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    graded = true;
+  }
+
+  function reset() {
+    graded = false;
+    render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  window.onload = () => {
+    document.getElementById('grade').onclick = grade;
+    document.getElementById('reset').onclick = reset;
+    load();
+  };
 </script>
 </body>
 </html>

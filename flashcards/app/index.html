@@ -1,56 +1,395 @@
-
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>DevSecOps Flashcards</title>
+<title>DevSecOps Flashcards – AZ-400 Study Tool</title>
 <style>
-body{font-family:system-ui,Segoe UI,Arial;margin:2rem;background:#f7f7fb}
-#wrap{max-width:900px;margin:0 auto}
-select,button{padding:.6rem 1rem;margin:.25rem}
-.card{background:#fff;border:1px solid #ddd;border-radius:10px;padding:2rem;box-shadow:0 2px 10px rgba(0,0,0,.05)}
-.q{font-size:1.2rem}
-.a{margin-top:1rem;color:#044}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: system-ui, 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    min-height: 100vh;
+    padding: 1.5rem;
+    color: #f1f5f9;
+  }
+
+  #wrap { max-width: 780px; margin: 0 auto; }
+
+  header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #60a5fa;
+    letter-spacing: -0.5px;
+  }
+
+  header p { color: #94a3b8; margin-top: 0.4rem; font-size: 0.95rem; }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    background: rgba(255,255,255,0.05);
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .controls label { font-size: 0.85rem; color: #94a3b8; white-space: nowrap; }
+
+  select {
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    background: #1e293b;
+    color: #f1f5f9;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+
+  .btn-group { display: flex; gap: 0.5rem; margin-left: auto; }
+
+  button {
+    padding: 0.5rem 1.1rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.15s ease;
+  }
+
+  .btn-primary {
+    background: #3b82f6;
+    color: #fff;
+  }
+  .btn-primary:hover { background: #2563eb; transform: translateY(-1px); }
+
+  .btn-secondary {
+    background: rgba(255,255,255,0.08);
+    color: #cbd5e1;
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.14); }
+
+  .btn-shuffle {
+    background: #7c3aed;
+    color: #fff;
+  }
+  .btn-shuffle:hover { background: #6d28d9; }
+
+  /* Card */
+  .card-container {
+    perspective: 1200px;
+    margin-bottom: 1.5rem;
+    cursor: pointer;
+  }
+
+  .card-inner {
+    position: relative;
+    width: 100%;
+    min-height: 240px;
+    transform-style: preserve-3d;
+    transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 16px;
+  }
+
+  .card-inner.flipped { transform: rotateY(180deg); }
+
+  .card-face {
+    position: absolute;
+    width: 100%;
+    min-height: 240px;
+    border-radius: 16px;
+    padding: 2rem;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .card-front {
+    background: #1e293b;
+    border: 1px solid #334155;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  .card-back {
+    background: #0c4a6e;
+    border: 1px solid #0284c7;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    transform: rotateY(180deg);
+  }
+
+  .card-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 1rem;
+  }
+
+  .card-front .card-label { color: #60a5fa; }
+  .card-back .card-label  { color: #38bdf8; }
+
+  .card-text {
+    font-size: 1.15rem;
+    line-height: 1.6;
+    color: #f1f5f9;
+  }
+
+  .card-hint {
+    margin-top: 1.25rem;
+    font-size: 0.78rem;
+    color: #64748b;
+    text-align: center;
+  }
+
+  /* Progress */
+  .progress-bar {
+    background: rgba(255,255,255,0.07);
+    border-radius: 99px;
+    height: 6px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    border-radius: 99px;
+    transition: width 0.3s ease;
+  }
+
+  .progress-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    color: #64748b;
+    margin-bottom: 0.6rem;
+  }
+
+  /* Navigation */
+  .nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .nav-count {
+    font-size: 0.9rem;
+    color: #94a3b8;
+    min-width: 80px;
+    text-align: center;
+  }
+
+  /* Module badges */
+  .module-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .badge {
+    padding: 0.3rem 0.75rem;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.15s;
+  }
+
+  .badge.active  { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+  .badge.inactive { background: rgba(255,255,255,0.06); color: #94a3b8; border-color: rgba(255,255,255,0.1); }
+  .badge.inactive:hover { background: rgba(255,255,255,0.1); color: #cbd5e1; }
+
+  .module-names {
+    module1: 'Landing Zone';
+    module2: 'Pipeline';
+    module3: 'Observability';
+    module4: 'AKS Blue/Green';
+    module5: 'ACA Canary';
+  }
 </style>
 </head>
 <body>
 <div id="wrap">
-  <h1>DevSecOps Flashcards</h1>
-  <p>Select a module and practice key concepts.</p>
-  <select id="module"></select>
-  <button id="prev">Prev</button>
-  <button id="flip">Flip</button>
-  <button id="next">Next</button>
-  <div class="card">
-    <div class="q" id="q"></div>
-    <div class="a" id="a" style="display:none"></div>
+
+  <header>
+    <h1>DevSecOps Flashcards</h1>
+    <p>AZ-400 exam prep — 50 cards across 5 modules. Click a card to flip it.</p>
+  </header>
+
+  <div class="module-badges" id="badges"></div>
+
+  <div class="controls">
+    <label for="module">Module:</label>
+    <select id="module"></select>
+    <div class="btn-group">
+      <button class="btn-shuffle" id="shuffle">Shuffle</button>
+    </div>
   </div>
+
+  <div class="progress-text">
+    <span id="progress-label">Card 1 of 10</span>
+    <span id="mastered-label">0 mastered</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+
+  <div class="card-container" id="card-container">
+    <div class="card-inner" id="card-inner">
+      <div class="card-face card-front">
+        <div class="card-label">Question</div>
+        <div class="card-text" id="q-text">Loading...</div>
+        <div class="card-hint">Click to reveal answer</div>
+      </div>
+      <div class="card-face card-back">
+        <div class="card-label">Answer</div>
+        <div class="card-text" id="a-text"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="btn-secondary" id="prev">← Prev</button>
+    <span class="nav-count" id="nav-count">1 / 10</span>
+    <button class="btn-primary" id="next">Next →</button>
+  </div>
+
 </div>
+
 <script>
-let data={}, keys=[], k='module1', i=0, show=false;
-async function load(){
-  const r = await fetch('../data/cards.json');
-  data = await r.json();
-  keys = Object.keys(data);
-  const sel = document.getElementById('module');
-  sel.innerHTML = keys.map(x=>`<option value="${x}">${x}</option>`).join('');
-  sel.value = k; sel.onchange = ()=>{k=sel.value;i=0;render(true)};
-  render(true);
-}
-function render(reset){
-  const set = data[k]||[]; if (!set.length) return;
-  if (reset) { i=0; show=false; }
-  const c=set[i];
-  document.getElementById('q').textContent=c.q;
-  const a=document.getElementById('a'); a.textContent=c.a; a.style.display=show?'block':'none';
-}
-window.onload=()=>{
-  document.getElementById('flip').onclick=()=>{show=!show;render()};
-  document.getElementById('next').onclick=()=>{i=(i+1)%data[k].length;show=false;render()};
-  document.getElementById('prev').onclick=()=>{i=(i-1+data[k].length)%data[k].length;show=false;render()};
-  load();
-}
+  const MODULE_LABELS = {
+    module1: 'M1: Landing Zone',
+    module2: 'M2: Pipeline',
+    module3: 'M3: Observability',
+    module4: 'M4: AKS Blue/Green',
+    module5: 'M5: ACA Canary'
+  };
+
+  let data = {}, currentModule = 'module1', currentIndex = 0, isFlipped = false;
+  let mastered = {};
+
+  async function load() {
+    const res = await fetch('../data/cards.json');
+    data = await res.json();
+
+    const keys = Object.keys(data);
+    const sel = document.getElementById('module');
+    sel.innerHTML = keys.map(k => `<option value="${k}">${MODULE_LABELS[k] || k}</option>`).join('');
+    sel.value = currentModule;
+    sel.onchange = () => { currentModule = sel.value; currentIndex = 0; syncBadges(); render(true); };
+
+    buildBadges(keys);
+    render(true);
+  }
+
+  function buildBadges(keys) {
+    const container = document.getElementById('badges');
+    container.innerHTML = keys.map(k =>
+      `<span class="badge ${k === currentModule ? 'active' : 'inactive'}" data-mod="${k}">${MODULE_LABELS[k] || k}</span>`
+    ).join('');
+    container.querySelectorAll('.badge').forEach(b => {
+      b.onclick = () => {
+        currentModule = b.dataset.mod;
+        currentIndex = 0;
+        document.getElementById('module').value = currentModule;
+        syncBadges();
+        render(true);
+      };
+    });
+  }
+
+  function syncBadges() {
+    document.querySelectorAll('.badge').forEach(b => {
+      b.className = 'badge ' + (b.dataset.mod === currentModule ? 'active' : 'inactive');
+    });
+  }
+
+  function render(reset) {
+    const cards = data[currentModule] || [];
+    if (!cards.length) return;
+    if (reset) { isFlipped = false; document.getElementById('card-inner').classList.remove('flipped'); }
+
+    const card = cards[currentIndex];
+    document.getElementById('q-text').textContent = card.q;
+    document.getElementById('a-text').textContent = card.a;
+    document.getElementById('nav-count').textContent = `${currentIndex + 1} / ${cards.length}`;
+    document.getElementById('progress-label').textContent = `Card ${currentIndex + 1} of ${cards.length}`;
+
+    const pct = ((currentIndex + 1) / cards.length) * 100;
+    document.getElementById('progress-fill').style.width = pct + '%';
+
+    const mod = currentModule;
+    if (!mastered[mod]) mastered[mod] = new Set();
+    document.getElementById('mastered-label').textContent = `${mastered[mod].size} mastered`;
+  }
+
+  function flip() {
+    isFlipped = !isFlipped;
+    document.getElementById('card-inner').classList.toggle('flipped', isFlipped);
+    if (isFlipped) {
+      if (!mastered[currentModule]) mastered[currentModule] = new Set();
+      mastered[currentModule].add(currentIndex);
+      document.getElementById('mastered-label').textContent = `${mastered[currentModule].size} mastered`;
+    }
+  }
+
+  function shuffle() {
+    const cards = data[currentModule];
+    if (!cards) return;
+    for (let i = cards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [cards[i], cards[j]] = [cards[j], cards[i]];
+    }
+    currentIndex = 0;
+    mastered[currentModule] = new Set();
+    render(true);
+  }
+
+  window.onload = () => {
+    document.getElementById('card-container').onclick = flip;
+    document.getElementById('next').onclick = () => {
+      const cards = data[currentModule] || [];
+      currentIndex = (currentIndex + 1) % cards.length;
+      render(true);
+    };
+    document.getElementById('prev').onclick = () => {
+      const cards = data[currentModule] || [];
+      currentIndex = (currentIndex - 1 + cards.length) % cards.length;
+      render(true);
+    };
+    document.getElementById('shuffle').onclick = shuffle;
+
+    // Keyboard navigation
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        const cards = data[currentModule] || [];
+        currentIndex = (currentIndex + 1) % cards.length;
+        render(true);
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        const cards = data[currentModule] || [];
+        currentIndex = (currentIndex - 1 + cards.length) % cards.length;
+        render(true);
+      } else if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        flip();
+      }
+    });
+
+    load();
+  };
 </script>
 </body>
 </html>
