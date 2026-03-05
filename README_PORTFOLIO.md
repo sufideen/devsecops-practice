@@ -7,7 +7,7 @@
 ## Who Is This For?
 
 This portfolio is aimed at:
-- **Hiring managers** assessing DevSecOps capability
+- **DevSecops Practioners** showcasing DevSecOps capability
 - **Azure Architects** evaluating depth in security engineering
 - **AZ-400 reviewers** mapping experience to exam domains
 
